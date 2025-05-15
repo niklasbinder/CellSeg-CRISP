@@ -788,3 +788,44 @@ class CVMask():
 
   # def compute_statistics(self, image):
 
+def quantify_cell_shapes(self):
+    """Calculate shape metrics for each segmented cell"""
+    from skimage import measure
+    
+    shape_metrics = []
+    
+    # For each cell in the mask
+    for i in range(1, self.n_instances + 1):
+        # Extract binary mask for this cell
+        cell_mask = (self.plane_mask == i)
+        
+        # Calculate region properties
+        props = measure.regionprops(cell_mask.astype(int))[0]
+        
+        # Calculate shape metrics
+        area = props.area
+        perimeter = props.perimeter
+        
+        # Circularity: 4π × (area/perimeter²)
+        circularity = 4 * np.pi * (area / (perimeter * perimeter)) if perimeter > 0 else 0
+        
+        # Eccentricity (0=circle, 1=line)
+        eccentricity = props.eccentricity
+        
+        # Aspect ratio
+        major_axis = props.major_axis_length
+        minor_axis = props.minor_axis_length
+        aspect_ratio = major_axis / minor_axis if minor_axis > 0 else 0
+        
+        # Solidity: area / convex hull area
+        solidity = props.solidity
+        
+        shape_metrics.append({
+            'cell_id': i,
+            'circularity': circularity,
+            'eccentricity': eccentricity,
+            'aspect_ratio': aspect_ratio,
+            'solidity': solidity
+        })
+    
+    return pd.DataFrame(shape_metrics)
