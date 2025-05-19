@@ -193,6 +193,7 @@ def main(indir, region_index=None, increase_factor=None, growth_plane=None, grow
     print('Computing cell centroids and ROIs')
     t0 = timer()
     stitched_mask.compute_centroids()
+    
     print(f'Compute centroids and ROIs: {timer()-t0:.1f}s'); t0=timer()
     
     if not os.path.exists(cf.IMAGEJ_OUTPUT_PATH): os.makedirs(cf.IMAGEJ_OUTPUT_PATH)
